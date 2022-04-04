@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:wallpaperhub_app/data/data.dart';
 import 'package:wallpaperhub_app/model/wallpaper_model.dart';
+import 'package:wallpaperhub_app/views/search.dart';
 import 'package:wallpaperhub_app/widgets/widget.dart';
 import '../model/categories_model.dart';
 import 'package:http/http.dart' as http;
@@ -18,24 +19,23 @@ class _HomeState extends State<Home> {
   List<CategoriesModel> categories = [];
   List<WallpaperModel> wallpapers = [];
 
+  TextEditingController searchController = new TextEditingController();
+
   getTrendingWallpapers() async {
-    var response = await http.get(Uri.parse('https://api.pexels.com/v1/curated?per_page=15&page=1'),
-    headers: {
-      "Authorization" : apiKey
-    });
+    var response = await http.get(
+        Uri.parse('https://api.pexels.com/v1/curated?per_page=15&page=1'),
+        headers: {"Authorization": apiKey});
     // print(response.body.toString());
 
     Map<String, dynamic> jsonData = jsonDecode(response.body);
-    jsonData["photos"].forEach((element){
+    jsonData["photos"].forEach((element) {
       // print(element);
       WallpaperModel wallpaperModel = new WallpaperModel();
       wallpaperModel = WallpaperModel.fromMap(element);
       wallpapers.add(wallpaperModel);
     });
 
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   @override
@@ -52,6 +52,7 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.white,
         title: BrandName(),
         elevation: 0.0,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -67,12 +68,22 @@ class _HomeState extends State<Home> {
                   children: [
                     Expanded(
                       child: TextField(
+                        controller: searchController,
                         decoration: InputDecoration(
                             hintText: 'Search Wallpaper',
                             border: InputBorder.none),
                       ),
                     ),
-                    Icon(Icons.search)
+                    GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Search(
+                                        searchQuery: searchController.text,
+                                      )));
+                        },
+                        child: Container(child: Icon(Icons.search)))
                   ],
                 ),
               ),
@@ -87,14 +98,12 @@ class _HomeState extends State<Home> {
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
-                      
                       return CategoriesTile(
                         title: categories[index].categorieName,
                         imgUrl: categories[index].imgUrl,
                       );
                     }),
               ),
-              SizedBox(height: 16,),
               wallpapersList(wallpapers, context)
             ],
           ),
@@ -123,12 +132,20 @@ class CategoriesTile extends StatelessWidget {
                 fit: BoxFit.cover,
               )),
           Container(
-            color: Colors.black26,
-            height: 50, width: 100,
-            alignment: Alignment.center,
-            child: Text(title!,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
-            ))
+              decoration: BoxDecoration(
+                color: Colors.black26,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              height: 50,
+              width: 100,
+              alignment: Alignment.center,
+              child: Text(
+                title!,
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15),
+              ))
         ],
       ),
     );
