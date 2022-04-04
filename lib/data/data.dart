@@ -1,5 +1,7 @@
 import '../model/categories_model.dart';
 
+String apiKey = '563492ad6f9170000100000114e5a940e103410b8333733ccd67e946';
+
 List<CategoriesModel> getCategories(){
 
   List<CategoriesModel> categories = [];

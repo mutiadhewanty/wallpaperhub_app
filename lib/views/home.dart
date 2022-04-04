@@ -1,8 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:wallpaperhub_app/data/data.dart';
 import 'package:wallpaperhub_app/widgets/widget.dart';
-
 import '../model/categories_model.dart';
+import 'package:http/http.dart' as http;
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -14,8 +16,22 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   List<CategoriesModel> categories = [];
 
+  getTrendingWallpapers() async {
+    var response = await http.get(Uri.parse('https://api.pexels.com/v1/curated?per_page=15&page=1'),
+    headers: {
+      "Authorization" : apiKey
+    });
+    // print(response.body.toString());
+
+    Map<String, dynamic> jsonData = jsonDecode(response.body);
+    jsonData["photos"].forEach((element){
+      print(element);
+    });
+  }
+
   @override
   void initState() {
+    getTrendingWallpapers();
     categories = getCategories();
     super.initState();
   }
@@ -99,7 +115,7 @@ class CategoriesTile extends StatelessWidget {
             height: 50, width: 100,
             alignment: Alignment.center,
             child: Text(title!,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 16),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15),
             ))
         ],
       ),
